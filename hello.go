@@ -1,9 +1,15 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 )
 
 func main() {
@@ -44,6 +50,7 @@ func executarComando(comando int) {
 		iniciarMonitoramento()
 	case 2:
 		fmt.Println("Exibindo logs...")
+		imprimeLogs()
 	case 0:
 		fmt.Println("Saindo do programa...")
 		fmt.Println("Programa finalizado")
@@ -55,10 +62,7 @@ func executarComando(comando int) {
 }
 
 func iniciarMonitoramento() {
-	// arrayTradicional := [4]string[1,2,3,4]
-	//Slice - Array abaixo que não tem tamanho definido, e pode adicionar elementos conforme necessário
-	sites := []string{"https://httpbin.org/status/200",
-		"https://www.alura.com.br", "https://www.caelum.com.br", "https://httpbin.org/status/400"}
+	sites := leSitesDoArquivo()
 
 	fmt.Println("Monitorando site(s)...")
 	for posicao, site := range sites {
@@ -71,11 +75,75 @@ func iniciarMonitoramento() {
 }
 
 func testaSite(site string) {
-	resp, _ := http.Get(site)
+	resp, err := http.Get(site)
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
 
 	if resp.StatusCode == 200 {
 		fmt.Println("Site:", site, "foi carregado com sucesso")
+		registraLog(site, true)
 	} else {
 		fmt.Println("Site:", site, "está com problemas. Não foi possível acessar - Status:", resp.StatusCode)
+		registraLog(site, false)
 	}
 }
+
+func leSitesDoArquivo() []string {
+
+	var sites []string
+
+	arquivo, err := os.Open("sites.txt")
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+
+	leitor := bufio.NewReader(arquivo)
+
+	for {
+		linha, err := leitor.ReadString('\n')
+
+		linha = strings.TrimSpace(linha)
+
+		sites = append(sites, linha)
+		//EOF -  Esse erro indica que chegou ao final do arquivo
+		if err == io.EOF {
+			break
+		}
+	}
+
+	arquivo.Close()
+	return sites
+}
+
+func registraLog(site string, status bool) {
+	arquivo, err := os.OpenFile("log.txt", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+
+	arquivo.WriteString(time.Now().Format("02/01/2006 15:04:05") + " - " + site +
+		" - online: " + strconv.FormatBool(status) + "\n")
+
+	arquivo.Close()
+}
+
+func imprimeLogs() {
+
+	arquivo, err := ioutil.ReadFile("log.txt")
+
+	if err != nil {
+		fmt.Println("Ocorreu um erro:", err)
+	}
+
+	fmt.Println(string(arquivo))
+}
+
+/*arrayTradicional := [4]string[1,2,3,4]
+/Slice - []string{1,2,3,4}
+Diferença entre os dois é que o tradicional tem a capacidade definida e o slice é dinâmico. Podendo
+adicionar mais elementos utilizando o append
+*/

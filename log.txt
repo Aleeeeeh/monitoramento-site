@@ -1,0 +1,6 @@
+12/11/2023 08:27:46 - https://www.alura.com.br - online: true
+12/11/2023 08:27:47 - https://random-status-code.herokuapp.com - online: false
+12/11/2023 08:27:47 - https://www.caelum.com.br - online: true
+12/11/2023 08:27:48 - https://www.casadocodigo.com.br - online: true
+12/11/2023 08:27:48 - https://httpbin.org/status/400 - online: false
+12/11/2023 08:27:49 - https://httpbin.org/status/200 - online: true

@@ -1,0 +1,6 @@
+https://www.alura.com.br    
+https://random-status-code.herokuapp.com 
+https://www.caelum.com.br
+https://www.casadocodigo.com.br
+https://httpbin.org/status/400
+https://httpbin.org/status/200
